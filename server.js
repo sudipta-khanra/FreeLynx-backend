@@ -20,9 +20,14 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://freelynx.vercel.app"],
-    credentials: true,
-  })
+  origin: [
+    "http://localhost:5173",
+    "https://freelynx.vercel.app",
+    "https://freelynx-git-main-sudipta-khanras-projects.vercel.app"
+  ],
+  credentials: true,
+})
+
 );
 
 // Static files

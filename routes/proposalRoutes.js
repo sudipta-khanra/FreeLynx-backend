@@ -1,7 +1,7 @@
 import express from "express";
 import { protect } from "../middlewares/authMiddleware.js";
 import Proposal from "../models/Proposal.js";
-import Job from "../models/Job.js"; // <-- Add this
+import Job from "../models/Job.js";
 import {
   submitProposal,
   getProposalsByJob,
@@ -11,7 +11,6 @@ import {
   rejectProposal,
 } from "../controllers/proposalController.js";
 
-
 const router = express.Router();
 
 // ✅ Special route first — avoids conflict with /:jobId
@@ -20,20 +19,18 @@ router.get("/all-populated", protect, async (req, res) => {
     let proposals;
 
     if (req.user.role === "admin") {
-      // Admin sees everything
       proposals = await Proposal.find()
         .populate("freelancerId", "name email")
         .populate("jobId", "title client");
     } else if (req.user.role === "client") {
-      // Client sees only proposals for their jobs
       const jobs = await Job.find({ client: req.user._id }).select("_id");
       const jobIds = jobs.map((job) => job._id);
+      if (!jobIds.length) return res.json([]); // No jobs, return empty array
 
       proposals = await Proposal.find({ jobId: { $in: jobIds } })
         .populate("freelancerId", "name email")
         .populate("jobId", "title client");
     } else if (req.user.role === "freelancer") {
-      // Freelancer sees only their proposals
       proposals = await Proposal.find({ freelancerId: req.user._id })
         .populate("jobId", "title client")
         .populate("freelancerId", "name email");
@@ -60,20 +57,20 @@ router.get("/all-populated", protect, async (req, res) => {
   }
 });
 
-
 // Create a proposal
 router.post("/", protect, submitProposal);
+
+// Get proposals by freelancer — keep this before /:jobId
+router.get("/", protect, getProposalsByFreelancer);
 
 // Get proposals by job
 router.get("/:jobId", protect, getProposalsByJob);
 
-// Get proposals by freelancer
-router.get("/", protect, getProposalsByFreelancer);
-
 // Delete a proposal
 router.delete("/:proposalId", protect, deleteProposalById);
 
-// Add accept/reject routes here
+// Accept/reject a proposal
 router.post("/:proposalId/accept", protect, acceptProposal);
 router.post("/:proposalId/reject", protect, rejectProposal);
+
 export default router;
