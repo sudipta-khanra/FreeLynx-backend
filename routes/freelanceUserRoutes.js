@@ -6,6 +6,7 @@ const router = express.Router();
 
 router.get("/:freelancerId", async (req, res) => {
   const id = req.params.freelancerId;
+  console.log(`id is here: ${id}`);
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).json({ message: "Invalid freelancer ID" });

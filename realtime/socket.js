@@ -13,6 +13,7 @@ export const setupSocket = (server) => {
   const onlineUsers = new Map();
 
   io.on("connection", (socket) => {
+    console.log("User connected:", socket.id);
 
     // register user
     socket.on("user:online", (userId) => {
@@ -42,7 +43,7 @@ export const setupSocket = (server) => {
     });
 
     socket.on("disconnect", () => {
-      console.log("User disconnected:");
+      console.log("User disconnected:", socket.id);
       if (socket.userId) onlineUsers.delete(socket.userId);
     });
   });

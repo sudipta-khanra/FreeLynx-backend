@@ -6,6 +6,7 @@ export const getMyJobs = async (req, res) => {
       .populate("postedBy", "name") // ✅ populate only the name field
       .populate("client", "name"); // optional if you want client name too
 
+    console.log("📦 Jobs found:", jobs.length);
     res.status(200).json(jobs);
   } catch (error) {
     console.error("❌ Failed to fetch jobs:", error.message);
