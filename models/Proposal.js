@@ -15,7 +15,7 @@ const proposalSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
-    minlength: 10,
+    minlength: 1,
   },
   proposedBudget: {
     type: Number,
