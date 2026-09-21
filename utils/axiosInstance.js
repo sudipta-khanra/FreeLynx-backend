@@ -1,4 +1,3 @@
-// utils/axiosInstance.js
 import axios from 'axios';
 
 const axiosInstance = axios.create({
@@ -9,7 +8,6 @@ axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token')?.trim();
 
-    // token যদি আসলেই থাকে এবং "undefined" স্ট্রিং না হয়
     if (token && token !== 'undefined' && token !== 'null') {
       config.headers.Authorization = `Bearer ${token}`;
     } else {

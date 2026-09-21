@@ -11,13 +11,10 @@ import {
 
 const router = express.Router();
 
-// Root routes (/api/jobs)
 router.route('/').get(getAllJobs).post(protect, createJob);
 
-// Specific routes
 router.get('/my', protect, getMyJobs);
 
-// ID based routes (/api/jobs/:id)
 router
   .route('/:id')
   .get(protect, getJobById)

@@ -7,38 +7,31 @@ export const getMyJobs = async (req, res) => {
       $or: [{ client: req.user._id }, { postedBy: req.user._id }],
     }).sort({ createdAt: -1 });
 
-    console.log('🔐 Authenticated User:', req.user._id);
-    console.log('📦 Jobs found:', jobs.length);
+    console.log('Authenticated User:', req.user._id);
+    console.log('Jobs found:', jobs.length);
 
     res.status(200).json(jobs);
   } catch (error) {
-    console.error('❌ Failed to fetch jobs:', error.message);
+    console.error('Failed to fetch jobs:', error.message);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
-
-// Create a new job
-
-// controllers/jobController.js
 
 export const createJob = async (req, res) => {
   try {
     const { title, description, budget, category, deadline } = req.body;
 
-    // 🔒 Auth verification
     if (!req.user || !req.user._id) {
       return res.status(401).json({ message: 'User not authenticated' });
     }
-
-    // 🔑 Job creation with both postedBy and client
     const job = await Job.create({
       title,
       description,
       budget: Number(budget),
       category,
       deadline,
-      postedBy: req.user._id, // 👈 এটি অত্যন্ত জরুরি (Schema failure আটকাবে)
-      client: req.user._id, // 👈 client field set
+      postedBy: req.user._id,
+      client: req.user._id,
     });
 
     res.status(201).json(job);
@@ -48,7 +41,6 @@ export const createJob = async (req, res) => {
   }
 };
 
-// Get all jobs (with search & pagination)
 export const getAllJobs = async (req, res) => {
   try {
     const { page = 1, limit = 20, search = '' } = req.query;
@@ -72,12 +64,11 @@ export const getAllJobs = async (req, res) => {
       totalPages: Math.ceil(total / limitNum),
     });
   } catch (error) {
-    console.error('❌ Fetch jobs error:', error.message);
+    console.error('Fetch jobs error:', error.message);
     res.status(500).json({ message: 'Server error' });
   }
 };
 
-// Get single job by ID
 export const getJobById = async (req, res) => {
   try {
     const job = await Job.findById(req.params.id).populate(
@@ -91,7 +82,7 @@ export const getJobById = async (req, res) => {
 
     res.json(job);
   } catch (error) {
-    console.error('❌ Get job error:', error.message);
+    console.error('Get job error:', error.message);
     if (error.kind === 'ObjectId') {
       return res.status(400).json({ message: 'Invalid Job ID format' });
     }
@@ -109,7 +100,6 @@ export const updateJob = async (req, res) => {
       return res.status(404).json({ message: 'Job not found' });
     }
 
-    // Owner check (client বা postedBy এর সাথে ম্যাচ করা)
     const ownerId = job.client?.toString() || job.postedBy?.toString();
     if (ownerId !== req.user._id.toString()) {
       return res
@@ -117,7 +107,6 @@ export const updateJob = async (req, res) => {
         .json({ message: 'Not authorized to update this job' });
     }
 
-    // Security: client ও postedBy পরিবর্তন হওয়া আটকানো
     const { client, postedBy, ...updateData } = req.body;
 
     const updatedJob = await Job.findByIdAndUpdate(id, updateData, {
@@ -139,12 +128,10 @@ export const updateJob = async (req, res) => {
 export const deleteJob = async (req, res) => {
   try {
     const job = await Job.findById(req.params.id);
-
     if (!job) {
       return res.status(404).json({ message: 'Job not found' });
     }
 
-    // Owner check
     const ownerId = job.client?.toString() || job.postedBy?.toString();
     if (ownerId !== req.user._id.toString()) {
       return res
@@ -155,7 +142,7 @@ export const deleteJob = async (req, res) => {
     await job.deleteOne();
     res.json({ message: 'Job deleted successfully' });
   } catch (error) {
-    console.error('❌ Delete job error:', error.message);
+    console.error('Delete job error:', error.message);
     if (error.kind === 'ObjectId') {
       return res.status(400).json({ message: 'Invalid Job ID format' });
     }

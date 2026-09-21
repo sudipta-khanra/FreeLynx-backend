@@ -35,7 +35,6 @@ const proposalSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Prevent duplicate proposals from the same freelancer to the same job
 proposalSchema.index({ jobId: 1, freelancerId: 1 }, { unique: true });
 
 export default mongoose.model('Proposal', proposalSchema);

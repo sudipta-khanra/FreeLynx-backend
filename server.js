@@ -13,7 +13,6 @@ const app = express();
 
 dotenv.config();
 
-// Serve uploads folder statically
 app.use('/uploads', express.static(path.resolve('uploads')));
 
 const allowedOrigins = [
@@ -36,27 +35,22 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-// ==================== CORS CONFIGURATION END ====================
 
 app.use(express.json());
 
-// Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/proposals', proposalRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/freelancers', freelancerRoutes);
 
-// Connect to DB
 connectDB();
 
-// Global Error Handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Something went wrong!' });
 });
 
-// Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
