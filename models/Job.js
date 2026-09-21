@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const jobSchema = new mongoose.Schema(
   {
@@ -28,16 +28,16 @@ const jobSchema = new mongoose.Schema(
     },
     client: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       required: true,
     },
     postedBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // refers to User collection
+      ref: 'User', // refers to User collection
       required: true,
     },
   },
   { timestamps: true }
 );
 
-export default mongoose.model("Job", jobSchema);
+export default mongoose.model('Job', jobSchema);

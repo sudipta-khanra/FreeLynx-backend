@@ -1,21 +1,24 @@
+import 'dotenv/config'; // 👈 ১. সবার উপরে dotenv লোড করা বাধ্যতামূলক
 import express from 'express';
-import dotenv from 'dotenv';
 import cors from 'cors';
+import path from 'path';
 import connectDB from './config/db.js';
+
 import authRoutes from './routes/authRoutes.js';
 import proposalRoutes from './routes/proposalRoutes.js';
 import jobRoutes from './routes/jobRoutes.js';
 import freelancerRoutes from './routes/freelanceUserRoutes.js';
 import userRoutes from './routes/userRoutes.js';
-import path from 'path';
 
 const app = express();
 
-dotenv.config();
+// Connect to DB
+connectDB();
 
 // Serve uploads folder statically
 app.use('/uploads', express.static(path.resolve('uploads')));
 
+// CORS Configuration
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3000',
@@ -36,9 +39,10 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-// ==================== CORS CONFIGURATION END ====================
 
+// Body Parsers (Routes-এর উপরে থাকতে হবে)
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -47,13 +51,12 @@ app.use('/api/jobs', jobRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/freelancers', freelancerRoutes);
 
-// Connect to DB
-connectDB();
-
 // Global Error Handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ message: 'Something went wrong!' });
+  res
+    .status(err.status || 500)
+    .json({ message: err.message || 'Something went wrong!' });
 });
 
 // Start server
